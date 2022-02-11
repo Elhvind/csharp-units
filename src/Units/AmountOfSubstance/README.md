@@ -1,0 +1,3 @@
+﻿# Amount of substance
+
+In chemistry, the amount of substance n in a given sample of matter is defined as the quantity or number of discrete atomic-scale particles in it divided by the Avogadro constant NA. The particles or entities may be molecules, atoms, ions, electrons, or other, depending on the context, and should be specified (e.g. amount of sodium chloride nNaCl). The value of the Avogadro constant NA has been defined as 6.02214076×1023 mol−1. The mole (symbol: mol) is a unit of amount of substance in the International System of Units, defined (since 2019) by fixing the Avogadro constant at the given value. Sometimes, the amount of substance is referred to as the chemical amount.
