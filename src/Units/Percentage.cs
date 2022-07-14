@@ -2,40 +2,51 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Units.Mass;
 
-namespace Units.Mass;
+namespace Units;
 
 /// <summary>
-/// The kilogram is the SI unit of mass.
+/// Percentage is a number or ratio expressed as a fraction of 100.
 /// </summary>
-/// <remarks>
-/// <para>SI unit: kg</para>
-/// <para>Symbol: kg</para>
-/// </remarks>
-[TypeConverter(typeof(KilogramTypeConverter))]
-[JsonConverter(typeof(KilogramJsonConverter))]
-public readonly struct Kilogram :
+[TypeConverter(typeof(PercentageTypeConverter))]
+[JsonConverter(typeof(PercentageJsonConverter))]
+public readonly struct Percentage :
     IComparable,
-    IComparable<Kilogram>,
+    IComparable<Percentage>,
     IConvertible,
-    IEquatable<Kilogram>
+    IEquatable<Percentage>
 {
     private readonly double _value;
 
-    public Kilogram(double value)
+    public Percentage(double percentage)
     {
-        _value = value;
+        _value = percentage;
     }
 
-    public Tonne InTonne() => new(_value / 1000);
+    public Percentage(double amount, double totalAmount)
+        : this(totalAmount == 0 ? 0 : (amount / totalAmount) * 100)
+    { }
 
-    public Liter InLiter(Density density) => new(density == 0 ? 0 : _value / density * 1000);
+    public double Fraction => _value / 100;
 
-    public static readonly Kilogram Empty = default;
+    public double Of(double value) => value * Fraction;
+    public Kilogram Of(Kilogram value) => (Kilogram)Of((double)value);
+    public Liter Of(Liter value) => (Liter)Of((double)value);
 
-    public static Kilogram Parse(string value) => new(double.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture));
+    public double Remainder(double value) => Total(value) - value;
+    public Kilogram Remainder(Kilogram value) => Total(value) - value;
+    public Liter Remainder(Liter value) => Total(value) - value;
 
-    public static bool TryParse(string value, out Kilogram result)
+    public double Total(double value) => value / Fraction;
+    public Kilogram Total(Kilogram value) => (Kilogram)Total((double)value);
+    public Liter Total(Liter value) => (Liter)Total((double)value);
+
+    public static readonly Percentage Empty = default;
+
+    public static Percentage Parse(string value) => new(double.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture));
+
+    public static bool TryParse(string value, out Percentage result)
     {
         var parsed = double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var output);
         result = new(output);
@@ -46,41 +57,41 @@ public readonly struct Kilogram :
 
     #region Math operators
 
-    public static Kilogram operator +(Kilogram left, Kilogram right) => new(left._value + right._value);
+    public static Percentage operator +(Percentage left, Percentage right) => new(left._value + right._value);
 
-    public static Kilogram operator -(Kilogram left, Kilogram right) => new(left._value - right._value);
+    public static Percentage operator -(Percentage left, Percentage right) => new(left._value - right._value);
 
-    public static Kilogram operator *(Kilogram left, Kilogram right) => new(left._value * right._value);
+    public static Percentage operator *(Percentage left, Percentage right) => new(left._value * right._value);
 
-    public static Kilogram operator /(Kilogram left, Kilogram right) => new(left._value / right._value);
-
-    #endregion
-
-    #region Equality operators
-
-    public static bool operator ==(Kilogram left, Kilogram right) => left.Equals(right);
-
-    public static bool operator !=(Kilogram left, Kilogram right) => !(left == right);
-
-    public static bool operator <(Kilogram left, Kilogram right) => left.CompareTo(right) < 0;
-
-    public static bool operator <=(Kilogram left, Kilogram right) => left.CompareTo(right) <= 0;
-
-    public static bool operator >(Kilogram left, Kilogram right) => left.CompareTo(right) > 0;
-
-    public static bool operator >=(Kilogram left, Kilogram right) => left.CompareTo(right) >= 0;
+    public static Percentage operator /(Percentage left, Percentage right) => new(left._value / right._value);
 
     #endregion
 
     #region Conversion operators
 
-    public static implicit operator double(Kilogram kilos) => kilos._value;
+    public static implicit operator double(Percentage percentage) => percentage._value;
 
-    public static explicit operator Kilogram(double value) => new(value);
+    public static explicit operator Percentage(double value) => new(value);
 
-    public static explicit operator Kilogram(float value) => new(value);
+    public static explicit operator Percentage(float value) => new(value);
 
-    public static explicit operator Kilogram(int value) => new(value);
+    public static explicit operator Percentage(int value) => new(value);
+
+    #endregion
+
+    #region Equality operators
+
+    public static bool operator ==(Percentage left, Percentage right) => left.Equals(right);
+
+    public static bool operator !=(Percentage left, Percentage right) => !(left == right);
+
+    public static bool operator <(Percentage left, Percentage right) => left.CompareTo(right) < 0;
+
+    public static bool operator <=(Percentage left, Percentage right) => left.CompareTo(right) <= 0;
+
+    public static bool operator >(Percentage left, Percentage right) => left.CompareTo(right) > 0;
+
+    public static bool operator >=(Percentage left, Percentage right) => left.CompareTo(right) >= 0;
 
     #endregion
 
@@ -90,18 +101,18 @@ public readonly struct Kilogram :
     {
         return obj != null
             && obj.GetType() == GetType()
-            && Equals((Kilogram)obj);
+            && Equals((Percentage)obj);
     }
 
-    public bool Equals(Kilogram other) => _value == other;
+    public bool Equals(Percentage other) => _value == other;
 
     #endregion
 
     #region IComparable
 
-    public int CompareTo(object? obj) => obj != null && obj.GetType() == GetType() ? CompareTo((Kilogram)obj) : 0;
+    public int CompareTo(object? obj) => obj != null && obj.GetType() == GetType() ? CompareTo((Percentage)obj) : 0;
 
-    public int CompareTo(Kilogram other) => _value.CompareTo(other);
+    public int CompareTo(Percentage other) => _value.CompareTo(other);
 
     #endregion
 
@@ -145,29 +156,29 @@ public readonly struct Kilogram :
 
     public override int GetHashCode() => _value.GetHashCode();
 
-    public override string ToString() => $"{_value} kg";
+    public override string ToString() => $"{_value} %";
 
     #endregion Struct base
 }
 
-public class KilogramJsonConverter : JsonConverter<Kilogram>
+public class PercentageJsonConverter : JsonConverter<Percentage>
 {
-    public override bool CanConvert(Type objectType) => objectType == typeof(Kilogram) || base.CanConvert(objectType);
+    public override bool CanConvert(Type objectType) => objectType == typeof(Percentage) || base.CanConvert(objectType);
 
-    public override Kilogram Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override Percentage Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = JsonSerializer.Deserialize<double>(ref reader, options);
         return new(value);
     }
 
-    public override void Write(Utf8JsonWriter writer, Kilogram value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, Percentage value, JsonSerializerOptions options)
     {
         var jsonString = JsonSerializer.Serialize<double>(value, options);
         writer.WriteRawValue(jsonString);
     }
 }
 
-public class KilogramTypeConverter : TypeConverter
+public class PercentageTypeConverter : TypeConverter
 {
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
     {
@@ -194,7 +205,7 @@ public class KilogramTypeConverter : TypeConverter
             convertedValue = (double)intValue;
         }
         return convertedValue is double result
-            ? new Kilogram(result)
+            ? new Percentage(result)
             : base.ConvertFrom(context, culture, value);
     }
 
@@ -210,19 +221,19 @@ public class KilogramTypeConverter : TypeConverter
     {
         var converter = TypeDescriptor.GetConverter(typeof(double));
 
-        if (value is Kilogram kilogram)
+        if (value is Percentage percentage)
         {
             if (converter.CanConvertTo(context, value.GetType()))
-                return converter.ConvertTo(context, culture, (double)kilogram, destinationType);
+                return converter.ConvertTo(context, culture, (double)percentage, destinationType);
 
             if (destinationType == typeof(string))
-                return kilogram.ToString();
+                return percentage.ToString();
 
             if (destinationType == typeof(double))
-                return kilogram.ToDouble(null);
+                return percentage.ToDouble(null);
 
             if (destinationType == typeof(int))
-                return kilogram.ToInt32(null);
+                return percentage.ToInt32(null);
         }
 
         return base.ConvertTo(context, culture, value, destinationType);

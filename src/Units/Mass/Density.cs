@@ -6,36 +6,38 @@ using System.Text.Json.Serialization;
 namespace Units.Mass;
 
 /// <summary>
-/// The kilogram is the SI unit of mass.
+/// The density of a substance is its mass per unit volume.
 /// </summary>
 /// <remarks>
-/// <para>SI unit: kg</para>
-/// <para>Symbol: kg</para>
+/// <para>SI unit: kg/m3</para>
+/// <para>Symbol: kg/m3</para>
 /// </remarks>
-[TypeConverter(typeof(KilogramTypeConverter))]
-[JsonConverter(typeof(KilogramJsonConverter))]
-public readonly struct Kilogram :
+[TypeConverter(typeof(DensityTypeConverter))]
+[JsonConverter(typeof(DensityJsonConverter))]
+public readonly struct Density :
     IComparable,
-    IComparable<Kilogram>,
+    IComparable<Density>,
     IConvertible,
-    IEquatable<Kilogram>
+    IEquatable<Density>
 {
     private readonly double _value;
 
-    public Kilogram(double value)
+    public Density(double value)
     {
         _value = value;
     }
 
-    public Tonne InTonne() => new(_value / 1000);
+    public Density(Kilogram kilogram, Liter liter)
+        : this(liter == 0 ? 0 : kilogram / liter * 1000)
+    { }
 
-    public Liter InLiter(Density density) => new(density == 0 ? 0 : _value / density * 1000);
+    public static readonly Density Empty = default;
 
-    public static readonly Kilogram Empty = default;
+    public static readonly Density Water = new(1000);
 
-    public static Kilogram Parse(string value) => new(double.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture));
+    public static Density Parse(string value) => new(double.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture));
 
-    public static bool TryParse(string value, out Kilogram result)
+    public static bool TryParse(string value, out Density result)
     {
         var parsed = double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var output);
         result = new(output);
@@ -46,41 +48,41 @@ public readonly struct Kilogram :
 
     #region Math operators
 
-    public static Kilogram operator +(Kilogram left, Kilogram right) => new(left._value + right._value);
+    public static Density operator +(Density left, Density right) => new(left._value + right._value);
 
-    public static Kilogram operator -(Kilogram left, Kilogram right) => new(left._value - right._value);
+    public static Density operator -(Density left, Density right) => new(left._value - right._value);
 
-    public static Kilogram operator *(Kilogram left, Kilogram right) => new(left._value * right._value);
+    public static Density operator *(Density left, Density right) => new(left._value * right._value);
 
-    public static Kilogram operator /(Kilogram left, Kilogram right) => new(left._value / right._value);
-
-    #endregion
-
-    #region Equality operators
-
-    public static bool operator ==(Kilogram left, Kilogram right) => left.Equals(right);
-
-    public static bool operator !=(Kilogram left, Kilogram right) => !(left == right);
-
-    public static bool operator <(Kilogram left, Kilogram right) => left.CompareTo(right) < 0;
-
-    public static bool operator <=(Kilogram left, Kilogram right) => left.CompareTo(right) <= 0;
-
-    public static bool operator >(Kilogram left, Kilogram right) => left.CompareTo(right) > 0;
-
-    public static bool operator >=(Kilogram left, Kilogram right) => left.CompareTo(right) >= 0;
+    public static Density operator /(Density left, Density right) => new(left._value / right._value);
 
     #endregion
 
     #region Conversion operators
 
-    public static implicit operator double(Kilogram kilos) => kilos._value;
+    public static implicit operator double(Density gram) => gram._value;
 
-    public static explicit operator Kilogram(double value) => new(value);
+    public static explicit operator Density(double value) => new(value);
 
-    public static explicit operator Kilogram(float value) => new(value);
+    public static explicit operator Density(float value) => new(value);
 
-    public static explicit operator Kilogram(int value) => new(value);
+    public static explicit operator Density(int value) => new(value);
+
+    #endregion
+
+    #region Equality operators
+
+    public static bool operator ==(Density left, Density right) => left.Equals(right);
+
+    public static bool operator !=(Density left, Density right) => !(left == right);
+
+    public static bool operator <(Density left, Density right) => left.CompareTo(right) < 0;
+
+    public static bool operator <=(Density left, Density right) => left.CompareTo(right) <= 0;
+
+    public static bool operator >(Density left, Density right) => left.CompareTo(right) > 0;
+
+    public static bool operator >=(Density left, Density right) => left.CompareTo(right) >= 0;
 
     #endregion
 
@@ -90,18 +92,18 @@ public readonly struct Kilogram :
     {
         return obj != null
             && obj.GetType() == GetType()
-            && Equals((Kilogram)obj);
+            && Equals((Density)obj);
     }
 
-    public bool Equals(Kilogram other) => _value == other;
+    public bool Equals(Density other) => _value == other;
 
     #endregion
 
     #region IComparable
 
-    public int CompareTo(object? obj) => obj != null && obj.GetType() == GetType() ? CompareTo((Kilogram)obj) : 0;
+    public int CompareTo(object? obj) => obj != null && obj.GetType() == GetType() ? CompareTo((Density)obj) : 0;
 
-    public int CompareTo(Kilogram other) => _value.CompareTo(other);
+    public int CompareTo(Density other) => _value.CompareTo(other);
 
     #endregion
 
@@ -145,29 +147,29 @@ public readonly struct Kilogram :
 
     public override int GetHashCode() => _value.GetHashCode();
 
-    public override string ToString() => $"{_value} kg";
+    public override string ToString() => $"{_value} kg/m3";
 
     #endregion Struct base
 }
 
-public class KilogramJsonConverter : JsonConverter<Kilogram>
+public class DensityJsonConverter : JsonConverter<Density>
 {
-    public override bool CanConvert(Type objectType) => objectType == typeof(Kilogram) || base.CanConvert(objectType);
+    public override bool CanConvert(Type objectType) => objectType == typeof(Density) || base.CanConvert(objectType);
 
-    public override Kilogram Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override Density Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = JsonSerializer.Deserialize<double>(ref reader, options);
         return new(value);
     }
 
-    public override void Write(Utf8JsonWriter writer, Kilogram value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, Density value, JsonSerializerOptions options)
     {
         var jsonString = JsonSerializer.Serialize<double>(value, options);
         writer.WriteRawValue(jsonString);
     }
 }
 
-public class KilogramTypeConverter : TypeConverter
+public class DensityTypeConverter : TypeConverter
 {
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
     {
@@ -194,7 +196,7 @@ public class KilogramTypeConverter : TypeConverter
             convertedValue = (double)intValue;
         }
         return convertedValue is double result
-            ? new Kilogram(result)
+            ? new Density(result)
             : base.ConvertFrom(context, culture, value);
     }
 
@@ -210,19 +212,19 @@ public class KilogramTypeConverter : TypeConverter
     {
         var converter = TypeDescriptor.GetConverter(typeof(double));
 
-        if (value is Kilogram kilogram)
+        if (value is Density density)
         {
             if (converter.CanConvertTo(context, value.GetType()))
-                return converter.ConvertTo(context, culture, (double)kilogram, destinationType);
+                return converter.ConvertTo(context, culture, (double)density, destinationType);
 
             if (destinationType == typeof(string))
-                return kilogram.ToString();
+                return density.ToString();
 
             if (destinationType == typeof(double))
-                return kilogram.ToDouble(null);
+                return density.ToDouble(null);
 
             if (destinationType == typeof(int))
-                return kilogram.ToInt32(null);
+                return density.ToInt32(null);
         }
 
         return base.ConvertTo(context, culture, value, destinationType);

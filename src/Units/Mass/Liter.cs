@@ -6,36 +6,36 @@ using System.Text.Json.Serialization;
 namespace Units.Mass;
 
 /// <summary>
-/// The kilogram is the SI unit of mass.
+/// The liter is a non-SI unit of volume.
 /// </summary>
 /// <remarks>
-/// <para>SI unit: kg</para>
-/// <para>Symbol: kg</para>
+/// <para>SI base unit: 10^-3 m3</para>
+/// <para>Symbol: L or l</para>
 /// </remarks>
-[TypeConverter(typeof(KilogramTypeConverter))]
-[JsonConverter(typeof(KilogramJsonConverter))]
-public readonly struct Kilogram :
+[TypeConverter(typeof(LiterTypeConverter))]
+[JsonConverter(typeof(LiterJsonConverter))]
+public readonly struct Liter :
     IComparable,
-    IComparable<Kilogram>,
+    IComparable<Liter>,
     IConvertible,
-    IEquatable<Kilogram>
+    IEquatable<Liter>
 {
     private readonly double _value;
 
-    public Kilogram(double value)
+    public Liter(double value)
     {
         _value = value;
     }
 
-    public Tonne InTonne() => new(_value / 1000);
+    public Kilogram InKilogram(Density density) => new(_value * density / 1000);
 
-    public Liter InLiter(Density density) => new(density == 0 ? 0 : _value / density * 1000);
+    public CubicMetre InCubicMetre() => new(_value / 1000);
 
-    public static readonly Kilogram Empty = default;
+    public static readonly Liter Empty = default;
 
-    public static Kilogram Parse(string value) => new(double.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture));
+    public static Liter Parse(string value) => new(double.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture));
 
-    public static bool TryParse(string value, out Kilogram result)
+    public static bool TryParse(string value, out Liter result)
     {
         var parsed = double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var output);
         result = new(output);
@@ -46,41 +46,41 @@ public readonly struct Kilogram :
 
     #region Math operators
 
-    public static Kilogram operator +(Kilogram left, Kilogram right) => new(left._value + right._value);
+    public static Liter operator +(Liter left, Liter right) => new(left._value + right._value);
 
-    public static Kilogram operator -(Kilogram left, Kilogram right) => new(left._value - right._value);
+    public static Liter operator -(Liter left, Liter right) => new(left._value - right._value);
 
-    public static Kilogram operator *(Kilogram left, Kilogram right) => new(left._value * right._value);
+    public static Liter operator *(Liter left, Liter right) => new(left._value * right._value);
 
-    public static Kilogram operator /(Kilogram left, Kilogram right) => new(left._value / right._value);
+    public static Liter operator /(Liter left, Liter right) => new(left._value / right._value);
 
     #endregion
 
     #region Equality operators
 
-    public static bool operator ==(Kilogram left, Kilogram right) => left.Equals(right);
+    public static bool operator ==(Liter left, Liter right) => left.Equals(right);
 
-    public static bool operator !=(Kilogram left, Kilogram right) => !(left == right);
+    public static bool operator !=(Liter left, Liter right) => !(left == right);
 
-    public static bool operator <(Kilogram left, Kilogram right) => left.CompareTo(right) < 0;
+    public static bool operator <(Liter left, Liter right) => left.CompareTo(right) < 0;
 
-    public static bool operator <=(Kilogram left, Kilogram right) => left.CompareTo(right) <= 0;
+    public static bool operator <=(Liter left, Liter right) => left.CompareTo(right) <= 0;
 
-    public static bool operator >(Kilogram left, Kilogram right) => left.CompareTo(right) > 0;
+    public static bool operator >(Liter left, Liter right) => left.CompareTo(right) > 0;
 
-    public static bool operator >=(Kilogram left, Kilogram right) => left.CompareTo(right) >= 0;
+    public static bool operator >=(Liter left, Liter right) => left.CompareTo(right) >= 0;
 
     #endregion
 
     #region Conversion operators
 
-    public static implicit operator double(Kilogram kilos) => kilos._value;
+    public static implicit operator double(Liter liter) => liter._value;
 
-    public static explicit operator Kilogram(double value) => new(value);
+    public static explicit operator Liter(double value) => new(value);
 
-    public static explicit operator Kilogram(float value) => new(value);
+    public static explicit operator Liter(float value) => new(value);
 
-    public static explicit operator Kilogram(int value) => new(value);
+    public static explicit operator Liter(int value) => new(value);
 
     #endregion
 
@@ -90,18 +90,18 @@ public readonly struct Kilogram :
     {
         return obj != null
             && obj.GetType() == GetType()
-            && Equals((Kilogram)obj);
+            && Equals((Liter)obj);
     }
 
-    public bool Equals(Kilogram other) => _value == other;
+    public bool Equals(Liter other) => _value == other;
 
     #endregion
 
     #region IComparable
 
-    public int CompareTo(object? obj) => obj != null && obj.GetType() == GetType() ? CompareTo((Kilogram)obj) : 0;
+    public int CompareTo(object? obj) => obj != null && obj.GetType() == GetType() ? CompareTo((Liter)obj) : 0;
 
-    public int CompareTo(Kilogram other) => _value.CompareTo(other);
+    public int CompareTo(Liter other) => _value.CompareTo(other);
 
     #endregion
 
@@ -145,29 +145,29 @@ public readonly struct Kilogram :
 
     public override int GetHashCode() => _value.GetHashCode();
 
-    public override string ToString() => $"{_value} kg";
+    public override string ToString() => $"{_value} l";
 
     #endregion Struct base
 }
 
-public class KilogramJsonConverter : JsonConverter<Kilogram>
+public class LiterJsonConverter : JsonConverter<Liter>
 {
-    public override bool CanConvert(Type objectType) => objectType == typeof(Kilogram) || base.CanConvert(objectType);
+    public override bool CanConvert(Type objectType) => objectType == typeof(Liter) || base.CanConvert(objectType);
 
-    public override Kilogram Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override Liter Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = JsonSerializer.Deserialize<double>(ref reader, options);
         return new(value);
     }
 
-    public override void Write(Utf8JsonWriter writer, Kilogram value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, Liter value, JsonSerializerOptions options)
     {
         var jsonString = JsonSerializer.Serialize<double>(value, options);
         writer.WriteRawValue(jsonString);
     }
 }
 
-public class KilogramTypeConverter : TypeConverter
+public class LiterTypeConverter : TypeConverter
 {
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
     {
@@ -194,7 +194,7 @@ public class KilogramTypeConverter : TypeConverter
             convertedValue = (double)intValue;
         }
         return convertedValue is double result
-            ? new Kilogram(result)
+            ? new Liter(result)
             : base.ConvertFrom(context, culture, value);
     }
 
@@ -210,19 +210,19 @@ public class KilogramTypeConverter : TypeConverter
     {
         var converter = TypeDescriptor.GetConverter(typeof(double));
 
-        if (value is Kilogram kilogram)
+        if (value is Liter liter)
         {
             if (converter.CanConvertTo(context, value.GetType()))
-                return converter.ConvertTo(context, culture, (double)kilogram, destinationType);
+                return converter.ConvertTo(context, culture, (double)liter, destinationType);
 
             if (destinationType == typeof(string))
-                return kilogram.ToString();
+                return liter.ToString();
 
             if (destinationType == typeof(double))
-                return kilogram.ToDouble(null);
+                return liter.ToDouble(null);
 
             if (destinationType == typeof(int))
-                return kilogram.ToInt32(null);
+                return liter.ToInt32(null);
         }
 
         return base.ConvertTo(context, culture, value, destinationType);

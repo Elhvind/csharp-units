@@ -6,36 +6,34 @@ using System.Text.Json.Serialization;
 namespace Units.Mass;
 
 /// <summary>
-/// The kilogram is the SI unit of mass.
+/// The cubic metre is the SI unit of volume.
 /// </summary>
 /// <remarks>
-/// <para>SI unit: kg</para>
-/// <para>Symbol: kg</para>
+/// <para>SI base unit: m3</para>
+/// <para>Symbol: m3</para>
 /// </remarks>
-[TypeConverter(typeof(KilogramTypeConverter))]
-[JsonConverter(typeof(KilogramJsonConverter))]
-public readonly struct Kilogram :
+[TypeConverter(typeof(CubicMetreTypeConverter))]
+[JsonConverter(typeof(CubicMetreJsonConverter))]
+public readonly struct CubicMetre :
     IComparable,
-    IComparable<Kilogram>,
+    IComparable<CubicMetre>,
     IConvertible,
-    IEquatable<Kilogram>
+    IEquatable<CubicMetre>
 {
     private readonly double _value;
 
-    public Kilogram(double value)
+    public CubicMetre(double value)
     {
         _value = value;
     }
 
-    public Tonne InTonne() => new(_value / 1000);
+    public Liter InLiter() => new(_value * 1000);
 
-    public Liter InLiter(Density density) => new(density == 0 ? 0 : _value / density * 1000);
+    public static readonly CubicMetre Empty = default;
 
-    public static readonly Kilogram Empty = default;
+    public static CubicMetre Parse(string value) => new(double.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture));
 
-    public static Kilogram Parse(string value) => new(double.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture));
-
-    public static bool TryParse(string value, out Kilogram result)
+    public static bool TryParse(string value, out CubicMetre result)
     {
         var parsed = double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var output);
         result = new(output);
@@ -46,41 +44,41 @@ public readonly struct Kilogram :
 
     #region Math operators
 
-    public static Kilogram operator +(Kilogram left, Kilogram right) => new(left._value + right._value);
+    public static CubicMetre operator +(CubicMetre left, CubicMetre right) => new(left._value + right._value);
 
-    public static Kilogram operator -(Kilogram left, Kilogram right) => new(left._value - right._value);
+    public static CubicMetre operator -(CubicMetre left, CubicMetre right) => new(left._value - right._value);
 
-    public static Kilogram operator *(Kilogram left, Kilogram right) => new(left._value * right._value);
+    public static CubicMetre operator *(CubicMetre left, CubicMetre right) => new(left._value * right._value);
 
-    public static Kilogram operator /(Kilogram left, Kilogram right) => new(left._value / right._value);
+    public static CubicMetre operator /(CubicMetre left, CubicMetre right) => new(left._value / right._value);
 
     #endregion
 
     #region Equality operators
 
-    public static bool operator ==(Kilogram left, Kilogram right) => left.Equals(right);
+    public static bool operator ==(CubicMetre left, CubicMetre right) => left.Equals(right);
 
-    public static bool operator !=(Kilogram left, Kilogram right) => !(left == right);
+    public static bool operator !=(CubicMetre left, CubicMetre right) => !(left == right);
 
-    public static bool operator <(Kilogram left, Kilogram right) => left.CompareTo(right) < 0;
+    public static bool operator <(CubicMetre left, CubicMetre right) => left.CompareTo(right) < 0;
 
-    public static bool operator <=(Kilogram left, Kilogram right) => left.CompareTo(right) <= 0;
+    public static bool operator <=(CubicMetre left, CubicMetre right) => left.CompareTo(right) <= 0;
 
-    public static bool operator >(Kilogram left, Kilogram right) => left.CompareTo(right) > 0;
+    public static bool operator >(CubicMetre left, CubicMetre right) => left.CompareTo(right) > 0;
 
-    public static bool operator >=(Kilogram left, Kilogram right) => left.CompareTo(right) >= 0;
+    public static bool operator >=(CubicMetre left, CubicMetre right) => left.CompareTo(right) >= 0;
 
     #endregion
 
     #region Conversion operators
 
-    public static implicit operator double(Kilogram kilos) => kilos._value;
+    public static implicit operator double(CubicMetre cubicMetre) => cubicMetre._value;
 
-    public static explicit operator Kilogram(double value) => new(value);
+    public static explicit operator CubicMetre(double value) => new(value);
 
-    public static explicit operator Kilogram(float value) => new(value);
+    public static explicit operator CubicMetre(float value) => new(value);
 
-    public static explicit operator Kilogram(int value) => new(value);
+    public static explicit operator CubicMetre(int value) => new(value);
 
     #endregion
 
@@ -90,18 +88,18 @@ public readonly struct Kilogram :
     {
         return obj != null
             && obj.GetType() == GetType()
-            && Equals((Kilogram)obj);
+            && Equals((CubicMetre)obj);
     }
 
-    public bool Equals(Kilogram other) => _value == other;
+    public bool Equals(CubicMetre other) => _value == other;
 
     #endregion
 
     #region IComparable
 
-    public int CompareTo(object? obj) => obj != null && obj.GetType() == GetType() ? CompareTo((Kilogram)obj) : 0;
+    public int CompareTo(object? obj) => obj != null && obj.GetType() == GetType() ? CompareTo((CubicMetre)obj) : 0;
 
-    public int CompareTo(Kilogram other) => _value.CompareTo(other);
+    public int CompareTo(CubicMetre other) => _value.CompareTo(other);
 
     #endregion
 
@@ -145,29 +143,29 @@ public readonly struct Kilogram :
 
     public override int GetHashCode() => _value.GetHashCode();
 
-    public override string ToString() => $"{_value} kg";
+    public override string ToString() => $"{_value} m3";
 
     #endregion Struct base
 }
 
-public class KilogramJsonConverter : JsonConverter<Kilogram>
+public class CubicMetreJsonConverter : JsonConverter<CubicMetre>
 {
-    public override bool CanConvert(Type objectType) => objectType == typeof(Kilogram) || base.CanConvert(objectType);
+    public override bool CanConvert(Type objectType) => objectType == typeof(CubicMetre) || base.CanConvert(objectType);
 
-    public override Kilogram Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override CubicMetre Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = JsonSerializer.Deserialize<double>(ref reader, options);
         return new(value);
     }
 
-    public override void Write(Utf8JsonWriter writer, Kilogram value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, CubicMetre value, JsonSerializerOptions options)
     {
         var jsonString = JsonSerializer.Serialize<double>(value, options);
         writer.WriteRawValue(jsonString);
     }
 }
 
-public class KilogramTypeConverter : TypeConverter
+public class CubicMetreTypeConverter : TypeConverter
 {
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
     {
@@ -194,7 +192,7 @@ public class KilogramTypeConverter : TypeConverter
             convertedValue = (double)intValue;
         }
         return convertedValue is double result
-            ? new Kilogram(result)
+            ? new CubicMetre(result)
             : base.ConvertFrom(context, culture, value);
     }
 
@@ -210,19 +208,19 @@ public class KilogramTypeConverter : TypeConverter
     {
         var converter = TypeDescriptor.GetConverter(typeof(double));
 
-        if (value is Kilogram kilogram)
+        if (value is CubicMetre cubicMetre)
         {
             if (converter.CanConvertTo(context, value.GetType()))
-                return converter.ConvertTo(context, culture, (double)kilogram, destinationType);
+                return converter.ConvertTo(context, culture, (double)cubicMetre, destinationType);
 
             if (destinationType == typeof(string))
-                return kilogram.ToString();
+                return cubicMetre.ToString();
 
             if (destinationType == typeof(double))
-                return kilogram.ToDouble(null);
+                return cubicMetre.ToDouble(null);
 
             if (destinationType == typeof(int))
-                return kilogram.ToInt32(null);
+                return cubicMetre.ToInt32(null);
         }
 
         return base.ConvertTo(context, culture, value, destinationType);
