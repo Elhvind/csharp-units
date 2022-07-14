@@ -10,9 +10,9 @@ public class CubicMetreNullValueConverter : ValueConverter<CubicMetre?, double?>
     {
     }
 
-    private static readonly Expression<Func<CubicMetre?, double?>> ToProvider = (CubicMetre? v) => v.Value;
+    private static readonly Expression<Func<CubicMetre?, double?>> ToProvider = (CubicMetre? v) => v == null ? null : v.Value;
 
-    private static readonly Expression<Func<double?, CubicMetre?>> FromProvider = (double? v) => new CubicMetre(v.Value);
+    private static readonly Expression<Func<double?, CubicMetre?>> FromProvider = (double? v) => v == null ? null : new CubicMetre(v.Value);
 }
 
 public class CubicMetreValueConverter : ValueConverter<CubicMetre, double>

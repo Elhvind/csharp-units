@@ -10,9 +10,9 @@ public class TonneNullValueConverter : ValueConverter<Tonne?, double?>
     {
     }
 
-    private static readonly Expression<Func<Tonne?, double?>> ToProvider = (Tonne? v) => v.Value;
+    private static readonly Expression<Func<Tonne?, double?>> ToProvider = (Tonne? v) => v == null ? null : v.Value;
 
-    private static readonly Expression<Func<double?, Tonne?>> FromProvider = (double? v) => new Tonne(v.Value);
+    private static readonly Expression<Func<double?, Tonne?>> FromProvider = (double? v) => v == null ? null : new Tonne(v.Value);
 }
 
 public class TonneValueConverter : ValueConverter<Tonne, double>

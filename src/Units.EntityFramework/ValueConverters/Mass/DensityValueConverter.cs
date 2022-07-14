@@ -10,9 +10,9 @@ public class DensityNullValueConverter : ValueConverter<Density?, double?>
     {
     }
 
-    private static readonly Expression<Func<Density?, double?>> ToProvider = (Density? v) => v.Value;
+    private static readonly Expression<Func<Density?, double?>> ToProvider = (Density? v) => v == null ? null : v.Value;
 
-    private static readonly Expression<Func<double?, Density?>> FromProvider = (double? v) => new Density(v.Value);
+    private static readonly Expression<Func<double?, Density?>> FromProvider = (double? v) => v == null ? null : new Density(v.Value);
 }
 
 public class DensityValueConverter : ValueConverter<Density, double>

@@ -9,9 +9,9 @@ public class PercentageNullValueConverter : ValueConverter<Percentage?, double?>
     {
     }
 
-    private static readonly Expression<Func<Percentage?, double?>> ToProvider = (Percentage? v) => v.Value;
+    private static readonly Expression<Func<Percentage?, double?>> ToProvider = (Percentage? v) => v == null ? null : v.Value;
 
-    private static readonly Expression<Func<double?, Percentage?>> FromProvider = (double? v) => new Percentage(v.Value);
+    private static readonly Expression<Func<double?, Percentage?>> FromProvider = (double? v) => v == null ? null : new Percentage(v.Value);
 }
 
 public class PercentageValueConverter : ValueConverter<Percentage, double>

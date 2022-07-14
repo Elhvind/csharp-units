@@ -10,9 +10,9 @@ public class LiterNullValueConverter : ValueConverter<Liter?, double?>
     {
     }
 
-    private static readonly Expression<Func<Liter?, double?>> ToProvider = (Liter? v) => v.Value;
+    private static readonly Expression<Func<Liter?, double?>> ToProvider = (Liter? v) => v == null ? null : v.Value;
 
-    private static readonly Expression<Func<double?, Liter?>> FromProvider = (double? v) => new Liter(v.Value);
+    private static readonly Expression<Func<double?, Liter?>> FromProvider = (double? v) => v == null ? null : new Liter(v.Value);
 }
 
 public class LiterValueConverter : ValueConverter<Liter, double>

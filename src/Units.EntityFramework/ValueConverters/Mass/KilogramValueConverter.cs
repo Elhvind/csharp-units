@@ -10,9 +10,9 @@ public class KilogramNullValueConverter : ValueConverter<Kilogram?, double?>
     {
     }
 
-    private static readonly Expression<Func<Kilogram?, double?>> ToProvider = (Kilogram? v) => v.Value;
+    private static readonly Expression<Func<Kilogram?, double?>> ToProvider = (Kilogram? v) => v == null ? null : v.Value;
 
-    private static readonly Expression<Func<double?, Kilogram?>> FromProvider = (double? v) => new Kilogram(v.Value);
+    private static readonly Expression<Func<double?, Kilogram?>> FromProvider = (double? v) => v == null ? null : new Kilogram(v.Value);
 }
 
 public class KilogramValueConverter : ValueConverter<Kilogram, double>
